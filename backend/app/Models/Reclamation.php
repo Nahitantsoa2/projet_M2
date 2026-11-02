@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Reclamation extends Model
 {
     protected $table = 'reclamation';
+
     protected $primaryKey = 'id_reclamation';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -23,7 +25,7 @@ class Reclamation extends Model
 
     protected $casts = [
         'date_creation' => 'datetime',
-        'date_reponse'  => 'datetime',
+        'date_reponse' => 'datetime',
     ];
 
     // --- Relations ---
@@ -41,5 +43,12 @@ class Reclamation extends Model
     public function demande()
     {
         return $this->belongsTo(Demande::class, 'id_demande');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(ReclamationMessage::class, 'id_reclamation')
+            ->orderBy('date_envoi')
+            ->orderBy('id_message');
     }
 }

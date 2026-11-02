@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class TypeDemarche extends Model
 {
     protected $table = 'type_demarche';
+
     protected $primaryKey = 'id_type_demarche';
+
     public $timestamps = false;
 
     protected $fillable = [

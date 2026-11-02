@@ -1,223 +1,183 @@
 /* ============================================================
-   Styles communs à tous les tableaux de bord
-   (fonctionnaire, chef de service, administrateur)
+   Dashboard Shared Styles
    ============================================================ */
 
-   .dashboard {
-    min-height: 100vh;
-    background: #f4f6fb;
-    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-    color: #262626;
-  }
-  
-  .dashboard-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #1e2761;
-    color: #ffffff;
-    padding: 1.1rem 2rem;
-  }
-  
-  .dashboard-header h1 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-  }
-  
-  .dashboard-header .role-badge {
-    display: inline-block;
-    margin-left: 0.6rem;
-    padding: 0.2rem 0.65rem;
-    background: #00b4a6;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    vertical-align: middle;
-  }
-  
-  .dashboard-header button {
-    background: transparent;
-    border: 1px solid #cadcfc;
-    color: #ffffff;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  
-  .dashboard-header button:hover {
-    background: rgba(255, 255, 255, 0.12);
-  }
-  
+.dashboard {
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* --- Card List (used by chef) --- */
+
+.card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card-item {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  transition: all 0.2s;
+}
+
+.card-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+
+.card-item .card-title {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.card-item .card-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* --- Buttons --- */
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-valider {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #ffffff;
+}
+
+.btn-rejeter {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: #ffffff;
+}
+
+/* --- Badge Statut --- */
+
+.badge-statut {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.badge-statut.soumise           { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.badge-statut.en_cours          { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.badge-statut.validee           { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.badge-statut.rejetee           { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.badge-statut.complement_demande { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+/* --- Table (used by admin) --- */
+
+.dashboard-table-wrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.dashboard-table th {
+  background: #f8fafc;
+  color: #64748b;
+  text-align: left;
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.dashboard-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.dashboard-table tr:last-child td {
+  border-bottom: none;
+}
+
+.dashboard-table tr:hover td {
+  background: #f8fafc;
+}
+
+/* --- Role Pills --- */
+
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.role-pill.fonctionnaire  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.role-pill.chef_service   { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.role-pill.administrateur { background: #fff7ed; color: #d97706; border: 1px solid #fed7aa; }
+
+/* --- Responsive --- */
+
+@media (max-width: 640px) {
   .dashboard-content {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 2rem;
+    padding: 1.25rem;
   }
-  
-  .dashboard-content h2 {
-    font-size: 1.1rem;
-    color: #1e2761;
-    margin: 0 0 1rem;
-  }
-  
-  .dashboard-empty {
-    background: #ffffff;
-    border: 1px dashed #cadcfc;
-    border-radius: 10px;
-    padding: 2rem;
-    text-align: center;
-    color: #6b6b6b;
-    font-size: 0.9rem;
-  }
-  
-  .dashboard-loading {
-    color: #6b6b6b;
-    font-size: 0.9rem;
-  }
-  
-  /* --- Cartes de liste (utilisées par fonctionnaire + chef) --- */
-  
-  .card-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
+
   .card-item {
-    background: #ffffff;
-    border-radius: 10px;
-    padding: 1rem 1.25rem;
-    box-shadow: 0 1px 3px rgba(30, 39, 97, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .card-item .card-title {
-    font-weight: 600;
-    color: #1e2761;
-  }
-  
-  .card-item .card-subtitle {
-    font-size: 0.85rem;
-    color: #6b6b6b;
-    margin-top: 0.15rem;
-  }
-  
-  .card-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-  
-  .btn {
-    border: none;
-    border-radius: 7px;
-    padding: 0.45rem 0.9rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  
-  .btn:hover {
-    opacity: 0.85;
-  }
-  
-  .btn-valider {
-    background: #1e8f5f;
-    color: #ffffff;
-  }
-  
-  .btn-rejeter {
-    background: #c0392b;
-    color: #ffffff;
-  }
-  
-  /* --- Badge de statut --- */
-  
-  .badge-statut {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: capitalize;
-  }
-  
-  .badge-statut.soumise        { background: #e8efFD; color: #1e2761; }
-  .badge-statut.en_cours       { background: #fff3cd; color: #8a6d00; }
-  .badge-statut.validee        { background: #d6f5e6; color: #1e8f5f; }
-  .badge-statut.rejetee        { background: #fdecea; color: #c0392b; }
-  .badge-statut.complement_demande { background: #e8e0fd; color: #5b3fae; }
-  
-  /* --- Table (utilisée par admin) --- */
-  
+
   .dashboard-table-wrapper {
-    background: #ffffff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(30, 39, 97, 0.08);
+    overflow-x: auto;
   }
-  
-  .dashboard-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88rem;
-  }
-  
-  .dashboard-table th {
-    background: #1e2761;
-    color: #ffffff;
-    text-align: left;
-    padding: 0.75rem 1rem;
-    font-weight: 600;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-  
-  .dashboard-table td {
-    padding: 0.7rem 1rem;
-    border-bottom: 1px solid #eef0f6;
-  }
-  
-  .dashboard-table tr:last-child td {
-    border-bottom: none;
-  }
-  
-  .dashboard-table tr:hover td {
-    background: #f9fafc;
-  }
-  
-  .role-pill {
-    display: inline-block;
-    padding: 0.15rem 0.55rem;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: capitalize;
-  }
-  
-  .role-pill.fonctionnaire   { background: #e8efFD; color: #1e2761; }
-  .role-pill.chef_service    { background: #d6f5e6; color: #1e8f5f; }
-  .role-pill.administrateur  { background: #ffe6d6; color: #b45309; }
-  
-  /* --- Responsive --- */
-  
-  @media (max-width: 640px) {
-    .dashboard-content { padding: 1.25rem; }
-    .dashboard-header { padding: 1rem; }
-    .card-item { flex-direction: column; align-items: flex-start; }
-    .dashboard-table-wrapper { overflow-x: auto; }
-  }
-  
+}

@@ -1,23 +1,45 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import api from "../services/api";
+import api, { initialiserCsrf } from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import { ArrowRight, HelpCircle } from "lucide-react";
+import "../styles/auth.css";
 
-const field =
-  "w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/15";
-const label =
-  "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500";
+const STATUTS = [
+  {
+    titre: "Demande n° 4521",
+    detail: "Autorisation de voyage · 12/10",
+    etat: "Validée",
+    variante: "ok",
+  },
+  {
+    titre: "Dossier suivi n° 1002",
+    detail: "Actes administratifs · 15/10",
+    etat: "En cours",
+    variante: "wait",
+  },
+  {
+    titre: "Réclamation n° 88",
+    detail: "Réponse du service · 15/10",
+    etat: "Répondue",
+    variante: "info",
+  },
+];
 
 export default function Register() {
   const [form, setForm] = useState({
     nom: "",
     prenom: "",
     email: "",
+    matricule: "",
     password: "",
     password_confirmation: "",
   });
+  const [voirMdp, setVoirMdp] = useState(false);
   const [erreur, setErreur] = useState(null);
   const [envoi, setEnvoi] = useState(false);
   const navigate = useNavigate();
+  const { actualiserUtilisateur } = useAuth();
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -39,11 +61,9 @@ export default function Register() {
 
     setEnvoi(true);
     try {
-      const { data } = await api.post("/register", form);
-
-      if (data?.token) localStorage.setItem("token", data.token);
-      if (data?.utilisateur)
-        localStorage.setItem("utilisateur", JSON.stringify(data.utilisateur));
+      await initialiserCsrf();
+      await api.post("/register", form);
+      await actualiserUtilisateur();
 
       navigate("/fonctionnaire", { replace: true });
     } catch (err) {
@@ -60,132 +80,192 @@ export default function Register() {
   }
 
   return (
-    <main className="grid min-h-screen bg-slate-50 lg:grid-cols-[1.05fr_1fr]">
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-blue-800 to-sky-500 p-12 lg:flex">
-        <span className="inline-flex w-fit items-center rounded-full border border-white/25 px-3 py-1 text-xs font-medium text-white/90">
-          Espace Services
-        </span>
-        <div className="max-w-md">
-          <h2 className="text-4xl font-semibold leading-tight text-white">
-            Une administration connectée, un accès unique.
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-white/80">
-            Gérez vos demandes, suivez vos dossiers et collaborez avec votre
-            service depuis une plateforme sécurisée.
+    <main className="auth-page">
+      {/* Colonne gauche — présentation */}
+      <section className="auth-brand">
+        <div className="auth-brand-content">
+          <span className="auth-brand-label">Espace Services</span>
+
+          <h1>Tous vos dossiers, au même endroit.</h1>
+
+          <p className="auth-brand-sub">
+            Suivez vos démarches en temps réel, posez vos questions à
+            l'assistant IA et recevez des alertes instantanées.
           </p>
+
+          <div className="auth-status-list">
+            {STATUTS.map((statut) => (
+              <article className="auth-status" key={statut.titre}>
+                <div>
+                  <p className="auth-status-title">{statut.titre}</p>
+                  <p className="auth-status-sub">{statut.detail}</p>
+                </div>
+                <span className={`auth-badge auth-badge--${statut.variante}`}>
+                  {statut.etat}
+                </span>
+              </article>
+            ))}
+          </div>
         </div>
-        <p className="text-xs text-white/70">
-          © {new Date().getFullYear()} Espace Services
+
+        <p className="auth-brand-footer">
+          © {new Date().getFullYear()} Espace Services — Tous droits réservés
         </p>
       </section>
 
-      <section className="flex items-center justify-center px-5 py-12">
-        <form
-          onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-900/5"
-        >
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-            Créer un compte
-          </h1>
-          <p className="mt-2 text-sm leading-relaxed text-slate-500">
-            Réservé aux fonctionnaires — les comptes chef de service et
-            administrateur sont créés par l'administration.
-          </p>
+      {/* Colonne droite — inscription */}
+      <section className="auth-form-section">
+        <div className="auth-card">
+          <header className="auth-card-header">
+            <h2>Créer un compte</h2>
+            <p>Réservé aux fonctionnaires de l'administration.</p>
+          </header>
 
-          <div className="mt-7 grid gap-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="nom" className={label}>Nom</label>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-form-grid">
+              <div className="auth-field">
+                <label htmlFor="nom">Nom</label>
+                <div className="auth-input-wrapper">
+                  <input
+                    id="nom"
+                    name="nom"
+                    value={form.nom}
+                    onChange={handleChange}
+                    placeholder="Rakoto"
+                    required
+                    autoComplete="family-name"
+                  />
+                </div>
+              </div>
+
+              <div className="auth-field">
+                <label htmlFor="prenom">Prénom</label>
+                <div className="auth-input-wrapper">
+                  <input
+                    id="prenom"
+                    name="prenom"
+                    value={form.prenom}
+                    onChange={handleChange}
+                    placeholder="Jean"
+                    required
+                    autoComplete="given-name"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="email">Adresse email</label>
+              <div className="auth-input-wrapper">
                 <input
-                  id="nom"
-                  name="nom"
-                  value={form.nom}
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={form.email}
                   onChange={handleChange}
+                  placeholder="vous@exemple.com"
                   required
-                  className={field}
+                  autoComplete="email"
                 />
               </div>
-              <div>
-                <label htmlFor="prenom" className={label}>Prénom</label>
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="matricule">
+                IM (matricule) <span>(facultatif)</span>
+              </label>
+              <div className="auth-input-wrapper">
                 <input
-                  id="prenom"
-                  name="prenom"
-                  value={form.prenom}
+                  id="matricule"
+                  name="matricule"
+                  type="text"
+                  value={form.matricule}
                   onChange={handleChange}
-                  required
-                  className={field}
+                  placeholder="Ex : 482296"
+                  autoComplete="off"
                 />
+              </div>
+              <p className="auth-field-hint">
+                Requis si votre compte possède un IM — permet d'afficher vos
+                dossiers.
+              </p>
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="password">Mot de passe</label>
+              <div className="auth-input-wrapper auth-input-wrapper--toggle">
+                <input
+                  id="password"
+                  name="password"
+                  type={voirMdp ? "text" : "password"}
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="8 caractères minimum"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  className="auth-toggle-password"
+                  onClick={() => setVoirMdp(!voirMdp)}
+                  aria-pressed={voirMdp}
+                >
+                  {voirMdp ? "Masquer" : "Afficher"}
+                </button>
               </div>
             </div>
 
-            <div>
-              <label htmlFor="email" className={label}>Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className={field}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className={label}>Mot de passe</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                value={form.password}
-                onChange={handleChange}
-                required
-                minLength={8}
-                className={field}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password_confirmation" className={label}>
+            <div className="auth-field">
+              <label htmlFor="password_confirmation">
                 Confirmer le mot de passe
               </label>
-              <input
-                id="password_confirmation"
-                name="password_confirmation"
-                type="password"
-                autoComplete="new-password"
-                value={form.password_confirmation}
-                onChange={handleChange}
-                required
-                minLength={8}
-                className={field}
-              />
+              <div className="auth-input-wrapper">
+                <input
+                  id="password_confirmation"
+                  name="password_confirmation"
+                  type={voirMdp ? "text" : "password"}
+                  value={form.password_confirmation}
+                  onChange={handleChange}
+                  placeholder="Retapez le mot de passe"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                />
+              </div>
             </div>
-          </div>
 
-          {erreur && (
-            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              {erreur}
-            </p>
-          )}
+            {erreur && (
+              <div className="auth-error" role="alert">
+                <span className="auth-error-dot" />
+                {erreur}
+              </div>
+            )}
 
-          <button
-            type="submit"
-            disabled={envoi}
-            className="mt-6 w-full rounded-lg bg-gradient-to-r from-blue-700 to-sky-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {envoi ? "Création du compte..." : "Créer mon compte"}
-          </button>
+            <button type="submit" className="auth-submit" disabled={envoi}>
+              {envoi ? (
+                <span className="auth-loading">
+                  <span className="auth-spinner" />
+                  Création du compte...
+                </span>
+              ) : (
+                <>
+                  Créer mon compte
+                  <ArrowRight size={18} strokeWidth={2} />
+                </>
+              )}
+            </button>
+          </form>
 
-          <p className="mt-5 text-center text-sm text-slate-500">
-            Déjà un compte ?{" "}
-            <Link to="/login" className="font-medium text-blue-700 hover:underline">
-              Se connecter
-            </Link>
+          <p className="auth-footer">
+            Déjà un compte ? <Link to="/login">Se connecter</Link>
           </p>
-        </form>
+
+          <p className="auth-help">
+            <HelpCircle size={14} strokeWidth={2} />
+            <span>Besoin d'aide ? Contactez votre service informatique.</span>
+          </p>
+        </div>
       </section>
     </main>
   );

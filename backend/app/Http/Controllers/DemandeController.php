@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreerDemandeIaRequest;
+use App\Http\Requests\StoreDemandeRequest;
+use App\Http\Requests\TraiterDemandeRequest;
 use App\Models\Demande;
 use App\Models\HistoriqueStatut;
 use App\Models\TypeDemarche;
@@ -12,17 +15,15 @@ class DemandeController extends Controller
 {
     // POST /api/demandes/ia — création automatique à partir d'un texte libre
     // Ex: "Je veux une demande de pension, nom Rakoto Jean, matricule 4521"
-    public function creerAvecIA(Request $request)
+    public function creerAvecIA(CreerDemandeIaRequest $request)
     {
-        $data = $request->validate([
-            'message' => 'required|string|max:1000',
-        ]);
+        $data = $request->validated();
 
         $typesDisponibles = TypeDemarche::pluck('libelle', 'id_type_demarche');
 
         $extraction = $this->extraireInformations($data['message'], $typesDisponibles);
 
-        if (!$extraction || empty($extraction['id_type_demarche'])) {
+        if (! $extraction || empty($extraction['id_type_demarche'])) {
             return response()->json([
                 'message' => "Je n'ai pas pu identifier le type de démarche. Précisez par exemple : \"demande de pension\" ou \"demande de congé\".",
             ], 422);
@@ -31,19 +32,19 @@ class DemandeController extends Controller
         $demande = Demande::create([
             'id_fonctionnaire' => $request->user()->id_utilisateur,
             'id_type_demarche' => $extraction['id_type_demarche'],
-            'statut'           => 'soumise',
-            'details'          => $extraction['details'] ?? [],
+            'statut' => 'soumise',
+            'details' => $extraction['details'] ?? [],
         ]);
 
         HistoriqueStatut::create([
-            'id_demande'     => $demande->id_demande,
-            'ancien_statut'  => null,
+            'id_demande' => $demande->id_demande,
+            'ancien_statut' => null,
             'nouveau_statut' => 'soumise',
         ]);
 
         return response()->json([
             'demande' => $demande->load('typeDemarche'),
-            'resume'  => $extraction['resume'] ?? 'Demande créée avec succès.',
+            'resume' => $extraction['resume'] ?? 'Demande créée avec succès.',
         ], 201);
     }
 
@@ -70,21 +71,21 @@ PROMPT;
             if (empty($apiKey) || $apiKey === 'votre_cle_api_ici') {
                 // Simulation of API response if no valid key is provided
                 return [
-                    "id_type_demarche" => $typesDisponibles->keys()->first(),
-                    "details" => ["simulé" => "vrai", "message" => $message],
-                    "resume" => "Demande simulée à partir de : " . $message
+                    'id_type_demarche' => $typesDisponibles->keys()->first(),
+                    'details' => ['simulé' => 'vrai', 'message' => $message],
+                    'resume' => 'Demande simulée à partir de : '.$message,
                 ];
             }
 
             $response = Http::withoutVerifying()->withHeaders([
-                'x-api-key'         => $apiKey,
+                'x-api-key' => $apiKey,
                 'anthropic-version' => '2023-06-01',
-                'content-type'      => 'application/json',
+                'content-type' => 'application/json',
             ])->post('https://api.anthropic.com/v1/messages', [
-                'model'      => config('services.anthropic.model') ?? 'claude-3-5-sonnet-20240620',
+                'model' => config('services.anthropic.model') ?? 'claude-3-5-sonnet-20240620',
                 'max_tokens' => 400,
-                'system'     => $systemPrompt,
-                'messages'   => [
+                'system' => $systemPrompt,
+                'messages' => [
                     ['role' => 'user', 'content' => $message],
                 ],
             ]);
@@ -105,26 +106,20 @@ PROMPT;
     }
 
     // POST /api/demandes — le fonctionnaire soumet une nouvelle démarche (formulaire manuel)
-    public function store(Request $request)
+    public function store(StoreDemandeRequest $request)
     {
-        $data = $request->validate([
-            'id_type_demarche' => 'required|exists:type_demarche,id_type_demarche',
-            'details'          => 'nullable|array',
-            'details.nom'      => 'nullable|string|max:150',
-            'details.matricule'=> 'nullable|string|max:50',
-            'details.motif'    => 'nullable|string|max:500',
-        ]);
+        $data = $request->validated();
 
         $demande = Demande::create([
             'id_fonctionnaire' => $request->user()->id_utilisateur,
             'id_type_demarche' => $data['id_type_demarche'],
-            'statut'           => 'soumise',
-            'details'          => $data['details'] ?? [],
+            'statut' => 'soumise',
+            'details' => $data['details'] ?? [],
         ]);
 
         HistoriqueStatut::create([
-            'id_demande'     => $demande->id_demande,
-            'ancien_statut'  => null,
+            'id_demande' => $demande->id_demande,
+            'ancien_statut' => null,
             'nouveau_statut' => 'soumise',
         ]);
 
@@ -135,7 +130,7 @@ PROMPT;
     public function mesDemandes(Request $request)
     {
         return Demande::where('id_fonctionnaire', $request->user()->id_utilisateur)
-            ->with(['typeDemarche', 'historique', 'documents'])
+            ->with(['typeDemarche'])
             ->orderByDesc('date_soumission')
             ->get();
     }
@@ -159,8 +154,8 @@ PROMPT;
     public function demandesAtraiter(Request $request)
     {
         return Demande::whereHas('fonctionnaire', function ($q) use ($request) {
-                $q->where('id_service', $request->user()->id_service);
-            })
+            $q->where('id_service', $request->user()->id_service);
+        })
             ->where('statut', 'soumise')
             ->with(['fonctionnaire', 'typeDemarche'])
             ->orderBy('date_soumission')
@@ -168,24 +163,27 @@ PROMPT;
     }
 
     // PATCH /api/chef/demandes/{id}/traiter — validation / rejet
-    public function traiter(Request $request, $id)
+    public function traiter(TraiterDemandeRequest $request, $id)
     {
-        $data = $request->validate([
-            'statut' => 'required|in:validee,rejetee,complement_demande',
-        ]);
+        $data = $request->validated();
 
-        $demande = Demande::findOrFail($id);
+        $demande = Demande::with('fonctionnaire')->findOrFail($id);
+
+        if ($demande?->fonctionnaire?->id_service !== $request->user()->id_service) {
+            return response()->json(['message' => 'Accès refusé'], 403);
+        }
+
         $ancienStatut = $demande->statut;
 
         $demande->update([
-            'statut'           => $data['statut'],
+            'statut' => $data['statut'],
             'id_chef_traitant' => $request->user()->id_utilisateur,
-            'date_traitement'  => now(),
+            'date_traitement' => now(),
         ]);
 
         HistoriqueStatut::create([
-            'id_demande'     => $demande->id_demande,
-            'ancien_statut'  => $ancienStatut,
+            'id_demande' => $demande->id_demande,
+            'ancien_statut' => $ancienStatut,
             'nouveau_statut' => $data['statut'],
         ]);
 
@@ -206,10 +204,10 @@ PROMPT;
         $base = Demande::whereHas('fonctionnaire', fn ($q) => $q->where('id_service', $idService));
 
         return response()->json([
-            'total'       => (clone $base)->count(),
-            'en_attente'  => (clone $base)->where('statut', 'soumise')->count(),
-            'validees'    => (clone $base)->where('statut', 'validee')->count(),
-            'rejetees'    => (clone $base)->where('statut', 'rejetee')->count(),
+            'total' => (clone $base)->count(),
+            'en_attente' => (clone $base)->where('statut', 'soumise')->count(),
+            'validees' => (clone $base)->where('statut', 'validee')->count(),
+            'rejetees' => (clone $base)->where('statut', 'rejetee')->count(),
         ]);
     }
 }

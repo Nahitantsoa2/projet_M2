@@ -57,33 +57,37 @@ class DemoSeeder extends Seeder
         Utilisateur::updateOrCreate(
             ['email' => 'fonctionnaire@test.com'],
             [
-                'nom'          => 'Rakoto',
-                'prenom'       => 'Jean',
+                'nom' => 'Rakoto',
+                'prenom' => 'Jean',
                 'mot_de_passe' => Hash::make('password'),
-                'role'         => 'fonctionnaire',
-                'id_service'   => $drh->id_service,
+                'role' => 'fonctionnaire',
+                'id_service' => $drh->id_service,
+                // Matricule (IM) de démonstration : doit exister dans
+                // frontend/src/data/suiviDossiers.json pour que la page
+                // Suivi affiche les dossiers réels de cet agent.
+                'matricule' => '482296',
             ]
         );
 
         Utilisateur::updateOrCreate(
             ['email' => 'chef@test.com'],
             [
-                'nom'          => 'Rabe',
-                'prenom'       => 'Marie',
+                'nom' => 'Rabe',
+                'prenom' => 'Marie',
                 'mot_de_passe' => Hash::make('password'),
-                'role'         => 'chef_service',
-                'id_service'   => $drh->id_service,
+                'role' => 'chef_service',
+                'id_service' => $drh->id_service,
             ]
         );
 
         Utilisateur::updateOrCreate(
             ['email' => 'admin@test.com'],
             [
-                'nom'          => 'Andria',
-                'prenom'       => 'Paul',
+                'nom' => 'Andria',
+                'prenom' => 'Paul',
                 'mot_de_passe' => Hash::make('password'),
-                'role'         => 'administrateur',
-                'id_service'   => $dsi->id_service,
+                'role' => 'administrateur',
+                'id_service' => $dsi->id_service,
             ]
         );
 

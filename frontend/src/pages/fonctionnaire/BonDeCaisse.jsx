@@ -1,5 +1,19 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+
+const InputField = ({ label, name, type = 'text', className = '', value, onChange }) => (
+  <div className="flex items-center mb-2">
+    <span className="w-32">{label} :</span>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className={`flex-1 border-b border-black border-dotted bg-transparent focus:outline-none focus:border-blue-500 print:border-black print:placeholder-transparent ${className}`}
+      placeholder={`Entrer ${label.toLowerCase()}`}
+    />
+  </div>
+);
 
 const BonDeCaisse = () => {
   const componentRef = useRef();
@@ -30,20 +44,6 @@ const BonDeCaisse = () => {
     documentTitle: 'Bon_de_Caisse',
   });
 
-  const InputField = ({ label, name, type = 'text', className = '' }) => (
-    <div className="flex items-center mb-2">
-      <span className="w-32">{label} :</span>
-      <input
-        type={type}
-        name={name}
-        value={formData[name]}
-        onChange={handleChange}
-        className={`flex-1 border-b border-black border-dotted bg-transparent focus:outline-none focus:border-blue-500 print:border-black print:placeholder-transparent ${className}`}
-        placeholder={`Entrer ${label.toLowerCase()}`}
-      />
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-8 flex flex-col items-center font-sans text-gray-800">
       
@@ -71,13 +71,13 @@ const BonDeCaisse = () => {
         <div className="flex flex-col sm:flex-row justify-between mb-8 gap-8 sm:gap-0">
           {/* Top Left - Info Fields */}
           <div className="w-full sm:w-1/2 text-sm">
-            <InputField label="Anarana" name="anarana" />
-            <InputField label="Fanampiny" name="fanampiny" />
-            <InputField label="C/N" name="cn" />
-            <InputField label="N°" name="num" />
-            <InputField label="Adiresy" name="adiresy" />
-            <InputField label="Tél" name="tel" />
-            <InputField label="Localité de service" name="localite" />
+            <InputField label="Anarana" name="anarana" value={formData.anarana} onChange={handleChange} />
+            <InputField label="Fanampiny" name="fanampiny" value={formData.fanampiny} onChange={handleChange} />
+            <InputField label="C/N" name="cn" value={formData.cn} onChange={handleChange} />
+            <InputField label="N°" name="num" value={formData.num} onChange={handleChange} />
+            <InputField label="Adiresy" name="adiresy" value={formData.adiresy} onChange={handleChange} />
+            <InputField label="Tél" name="tel" value={formData.tel} onChange={handleChange} />
+            <InputField label="Localité de service" name="localite" value={formData.localite} onChange={handleChange} />
           </div>
 
           {/* Top Right - Destination */}

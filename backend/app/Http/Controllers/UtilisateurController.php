@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUtilisateurRequest;
+use App\Http\Requests\UpdateUtilisateurRequest;
+use App\Models\Demande;
+use App\Models\Reclamation;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UtilisateurController extends Controller
@@ -15,24 +20,17 @@ class UtilisateurController extends Controller
     }
 
     // POST /api/admin/utilisateurs
-    public function store(Request $request)
+    public function store(StoreUtilisateurRequest $request)
     {
-        $data = $request->validate([
-            'nom'        => 'required|string|max:100',
-            'prenom'     => 'required|string|max:100',
-            'email'      => 'required|email|unique:utilisateur,email',
-            'password'   => 'required|string|min:8',
-            'role'       => 'required|in:fonctionnaire,chef_service,administrateur',
-            'id_service' => 'required|exists:service,id_service',
-        ]);
+        $data = $request->validated();
 
         $utilisateur = Utilisateur::create([
-            'nom'          => $data['nom'],
-            'prenom'       => $data['prenom'],
-            'email'        => $data['email'],
+            'nom' => $data['nom'],
+            'prenom' => $data['prenom'],
+            'email' => $data['email'],
             'mot_de_passe' => Hash::make($data['password']),
-            'role'         => $data['role'],
-            'id_service'   => $data['id_service'],
+            'role' => $data['role'],
+            'id_service' => $data['id_service'],
         ]);
 
         return response()->json($utilisateur, 201);
@@ -45,17 +43,11 @@ class UtilisateurController extends Controller
     }
 
     // PUT/PATCH /api/admin/utilisateurs/{id}
-    public function update(Request $request, $id)
+    public function update(UpdateUtilisateurRequest $request, $id)
     {
         $utilisateur = Utilisateur::findOrFail($id);
 
-        $data = $request->validate([
-            'nom'        => 'sometimes|string|max:100',
-            'prenom'     => 'sometimes|string|max:100',
-            'email'      => 'sometimes|email|unique:utilisateur,email,' . $id . ',id_utilisateur',
-            'role'       => 'sometimes|in:fonctionnaire,chef_service,administrateur',
-            'id_service' => 'sometimes|exists:service,id_service',
-        ]);
+        $data = $request->validated();
 
         $utilisateur->update($data);
 
@@ -63,9 +55,29 @@ class UtilisateurController extends Controller
     }
 
     // DELETE /api/admin/utilisateurs/{id}
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        Utilisateur::findOrFail($id)->delete();
+        // On empêche un administrateur de supprimer son propre compte.
+        if ((int) $id === (int) $request->user()->id_utilisateur) {
+            return response()->json(
+                ['message' => 'Vous ne pouvez pas supprimer votre propre compte.'],
+                403
+            );
+        }
+
+        $utilisateur = Utilisateur::findOrFail($id);
+        $idUtilisateur = $utilisateur->id_utilisateur;
+
+        DB::transaction(function () use ($utilisateur, $idUtilisateur) {
+            // Ces deux tables référencent l'utilisateur avec une contrainte
+            // RESTRICT : il faut les vider d'abord sinon Postgres refuse la
+            // suppression. Le reste (documents, historiques, messages,
+            // notifications, conversations) est supprimé en cascade par la base.
+            Demande::where('id_fonctionnaire', $idUtilisateur)->delete();
+            Reclamation::where('id_fonctionnaire', $idUtilisateur)->delete();
+
+            $utilisateur->delete();
+        });
 
         return response()->json(['message' => 'Utilisateur supprimé']);
     }

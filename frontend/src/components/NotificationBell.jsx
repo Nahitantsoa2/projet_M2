@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import api from "../services/api";
-import { Bell } from "lucide-react";
+import { Bell, X, Trash2 } from "lucide-react";
 import "../styles/notifications.css";
 
 export default function NotificationBell() {
@@ -8,33 +8,39 @@ export default function NotificationBell() {
   const [ouvert, setOuvert] = useState(false);
   const dropdownRef = useRef(null);
 
+  const chargerNotifications = useCallback(() => {
+    // Évite les requêtes inutiles si la fenêtre/l'onglet est en arrière-plan
+    if (typeof document !== "undefined" && document.hidden) return;
+    api
+      .get("/notifications")
+      .then(({ data }) => setNotifications(data))
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     chargerNotifications();
+    const intervalId = setInterval(chargerNotifications, 60000); // 60s au lieu de 30s pour économiser les ressources
 
-    // Actualiser les notifications toutes les 30 secondes
-    const intervalId = setInterval(() => {
-      chargerNotifications();
-    }, 30000);
+    function handleVisibilityChange() {
+      if (!document.hidden) {
+        chargerNotifications();
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Fermer le dropdown si on clique en dehors
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOuvert(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       clearInterval(intervalId);
     };
-  }, []);
-
-  const chargerNotifications = () => {
-    api.get("/notifications").then(({ data }) => {
-      setNotifications(data);
-    }).catch(console.error);
-  };
+  }, [chargerNotifications]);
 
   const marquerLu = async (id) => {
     try {
@@ -42,6 +48,15 @@ export default function NotificationBell() {
       setNotifications((prev) =>
         prev.map(n => n.id_notification === id ? { ...n, lu: true } : n)
       );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const supprimer = async (id) => {
+    try {
+      await api.delete(`/notifications/${id}`);
+      setNotifications((prev) => prev.filter(n => n.id_notification !== id));
     } catch (error) {
       console.error(error);
     }
@@ -56,20 +71,36 @@ export default function NotificationBell() {
         onClick={() => setOuvert(!ouvert)}
         title="Notifications"
       >
-        <Bell size={24} color="#ffffff" />
-        {nonLues > 0 && <span className="notification-badge">{nonLues}</span>}
+        <Bell size={20} className="text-gray-500" />
+        {nonLues > 0 && (
+          <span className="notification-badge">
+            {nonLues > 9 ? '9+' : nonLues}
+          </span>
+        )}
       </button>
 
       {ouvert && (
         <div className="notification-dropdown">
           <div className="notification-header">
             <h3>Notifications</h3>
-            {nonLues > 0 && <span className="notification-count">{nonLues} non lue(s)</span>}
+            <div className="notification-header-actions">
+              {nonLues > 0 && <span className="notification-count">{nonLues} non lue(s)</span>}
+              <button
+                type="button"
+                className="notification-close-btn"
+                onClick={() => setOuvert(false)}
+                title="Fermer"
+              >
+                <X size={16} />
+              </button>
+            </div>
           </div>
 
           <div className="notification-list">
             {notifications.length === 0 ? (
-              <p className="notification-empty">Aucune notification.</p>
+              <div className="notification-empty">
+                <p>Aucune notification</p>
+              </div>
             ) : (
               notifications.map((notif) => (
                 <div
@@ -79,10 +110,23 @@ export default function NotificationBell() {
                     if (!notif.lu) marquerLu(notif.id_notification);
                   }}
                 >
-                  <p className="notification-msg">{notif.message}</p>
-                  <span className="notification-date">
-                    {new Date(notif.date_envoi).toLocaleString('fr-FR')}
-                  </span>
+                  <div className="notification-item-content">
+                    <p className="notification-msg">{notif.message}</p>
+                    <span className="notification-date">
+                      {new Date(notif.date_envoi).toLocaleString('fr-FR')}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="notification-delete-btn"
+                    title="Effacer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      supprimer(notif.id_notification);
+                    }}
+                  >
+                    <Trash2 size={15} />
+                  </button>
                 </div>
               ))
             )}

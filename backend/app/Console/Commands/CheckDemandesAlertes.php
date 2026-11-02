@@ -29,7 +29,7 @@ class CheckDemandesAlertes extends Command
      */
     public function handle()
     {
-        $this->info("Vérification des demandes en cours...");
+        $this->info('Vérification des demandes en cours...');
 
         // 1. Alertes pour les dossiers en attente depuis plus de 3 jours (Dossiers urgents)
         $dateLimite = Carbon::now()->subDays(3);
@@ -40,20 +40,20 @@ class CheckDemandesAlertes extends Command
         foreach ($demandesUrgentes as $demande) {
             // Notifier le chef traitant s'il y en a un, sinon notifier les chefs de service du même service
             $message = "⚠️ Alerte Urgence : La demande #{$demande->id_demande} ({$demande->typeDemarche->libelle}) est en attente depuis plus de 3 jours. Merci de la traiter rapidement.";
-            
+
             if ($demande->id_chef_traitant) {
                 $this->notifierSaufSiExiste($demande->id_chef_traitant, $message);
             } else {
                 // Trouver les chefs de service
                 $chefs = Utilisateur::where('role', 'chef_service')
-                                    ->where('id_service', $demande->fonctionnaire->id_service ?? null)
-                                    ->get();
+                    ->where('id_service', $demande->fonctionnaire->id_service ?? null)
+                    ->get();
                 foreach ($chefs as $chef) {
                     $this->notifierSaufSiExiste($chef->id_utilisateur, $message);
                 }
             }
         }
-        $this->info(count($demandesUrgentes) . " demande(s) urgente(s) vérifiée(s).");
+        $this->info(count($demandesUrgentes).' demande(s) urgente(s) vérifiée(s).');
 
         // 2. Alertes pour les dossiers incomplets (pièces manquantes)
         // On suppose que le statut "complement_demande" existe
@@ -66,9 +66,9 @@ class CheckDemandesAlertes extends Command
                 $this->notifierSaufSiExiste($demande->id_fonctionnaire, $message);
             }
         }
-        $this->info(count($demandesIncompletes) . " demande(s) incomplète(s) vérifiée(s).");
+        $this->info(count($demandesIncompletes).' demande(s) incomplète(s) vérifiée(s).');
 
-        $this->info("Vérification terminée avec succès.");
+        $this->info('Vérification terminée avec succès.');
     }
 
     private function notifierSaufSiExiste($idUtilisateur, $message)
@@ -79,12 +79,12 @@ class CheckDemandesAlertes extends Command
             ->whereDate('date_envoi', Carbon::today())
             ->exists();
 
-        if (!$existe) {
+        if (! $existe) {
             Notification::create([
                 'id_utilisateur' => $idUtilisateur,
-                'message'        => $message,
-                'lu'             => false,
-                'date_envoi'     => Carbon::now()
+                'message' => $message,
+                'lu' => false,
+                'date_envoi' => Carbon::now(),
             ]);
             // NB: Pour envoyer un Email ou SMS, on pourrait appeler Mail::to(...)->send(...) ici.
         }
