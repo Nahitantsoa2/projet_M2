@@ -6,7 +6,11 @@ return [
 
     'allowed_methods' => ['*'],
 
+<<<<<<< HEAD
     'allowed_origins' => array_values(array_filter(array_map('trim', explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,https://srsp-frontend-chi.vercel.app'))))),
+=======
+    'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173')),
+>>>>>>> origin/main
 
     'allowed_origins_patterns' => [
         '#^https://.*\.vercel\.app$#',

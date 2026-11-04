@@ -9,13 +9,34 @@ export default function NotificationBell() {
   const dropdownRef = useRef(null);
 
   const chargerNotifications = useCallback(() => {
+<<<<<<< HEAD
     api.get("/notifications").then(({ data }) => setNotifications(data)).catch(console.error);
+=======
+    // Évite les requêtes inutiles si la fenêtre/l'onglet est en arrière-plan
+    if (typeof document !== "undefined" && document.hidden) return;
+    api
+      .get("/notifications")
+      .then(({ data }) => setNotifications(data))
+      .catch(() => {});
+>>>>>>> origin/main
   }, []);
 
   useEffect(() => {
     chargerNotifications();
+<<<<<<< HEAD
     const intervalId = setInterval(() => chargerNotifications(), 30000);
 
+=======
+    const intervalId = setInterval(chargerNotifications, 60000); // 60s au lieu de 30s pour économiser les ressources
+
+    function handleVisibilityChange() {
+      if (!document.hidden) {
+        chargerNotifications();
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+>>>>>>> origin/main
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOuvert(false);
@@ -25,6 +46,7 @@ export default function NotificationBell() {
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       clearInterval(intervalId);
     };
   }, [chargerNotifications]);

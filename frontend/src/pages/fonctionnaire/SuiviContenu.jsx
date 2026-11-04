@@ -21,6 +21,13 @@ const TYPE_STYLES = {
 };
 
 const DETAILS_LABELS = {
+<<<<<<< HEAD
+=======
+  localite: "Localité",
+  chap: "Chapitre",
+  im: "IM / N° pension",
+  cmv: "Code Mouvement (CMV)",
+>>>>>>> origin/main
   ref_be: "Réf BE arrivé",
   ref_dossier: "Réf dossier",
   im: "IM / N° pension",
@@ -86,10 +93,20 @@ export default function SuiviContenu() {
       const okType = filtreType === "Tous" || d.type_dossier === filtreType;
       const okTexte =
         !q ||
+<<<<<<< HEAD
         String(d.ref_dossier).toLowerCase().includes(q) ||
         String(d.nature_dossier).toLowerCase().includes(q) ||
         String(d.nom_prenom).toLowerCase().includes(q) ||
         String(d.im).toLowerCase().includes(q);
+=======
+        String(d.ref_dossier || "").toLowerCase().includes(q) ||
+        String(d.nature_dossier || "").toLowerCase().includes(q) ||
+        String(d.nom_prenom || "").toLowerCase().includes(q) ||
+        String(d.im || "").toLowerCase().includes(q) ||
+        String(d.localite || "").toLowerCase().includes(q) ||
+        String(d.chap || "").toLowerCase().includes(q) ||
+        String(d.cmv || "").toLowerCase().includes(q);
+>>>>>>> origin/main
       return okEtat && okType && okTexte;
     });
   }, [mesDossiers, filtreEtat, filtreType, recherche]);
@@ -243,6 +260,7 @@ export default function SuiviContenu() {
                           </div>
                           <div className="min-w-0">
                             <h3 className="font-bold text-gray-900 text-sm truncate">
+<<<<<<< HEAD
                               #{d.ref_dossier} · {d.nature_dossier}
                             </h3>
                             <div className="flex items-center gap-3 mt-1 text-xs text-gray-400 flex-wrap">
@@ -252,6 +270,36 @@ export default function SuiviContenu() {
                               <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold border ${typeCls}`}>
                                 {d.type_dossier}
                               </span>
+=======
+                              {d.ref_dossier ? `#${d.ref_dossier} · ${d.nature_dossier || "Dossier"}` : `Dossier IM : ${d.im}`}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 flex-wrap">
+                              {d.localite && (
+                                <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                                  Localité : {d.localite}
+                                </span>
+                              )}
+                              {d.chap && (
+                                <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                                  Chap : {d.chap}
+                                </span>
+                              )}
+                              {d.cmv && (
+                                <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                  CMV {d.cmv}
+                                </span>
+                              )}
+                              {d.date_reception && (
+                                <span className="flex items-center gap-1 text-gray-400">
+                                  <Clock size={12} /> {d.date_reception}
+                                </span>
+                              )}
+                              {d.type_dossier && (
+                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold border ${typeCls}`}>
+                                  {d.type_dossier}
+                                </span>
+                              )}
+>>>>>>> origin/main
                             </div>
                           </div>
                         </div>

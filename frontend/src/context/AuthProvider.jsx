@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
+=======
+import { useEffect, useState, useMemo, useCallback } from "react";
+>>>>>>> origin/main
 import api, { initialiserCsrf } from "../services/api";
 import { authContext } from "./AuthContext";
 
@@ -12,6 +16,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let annule = false;
+<<<<<<< HEAD
     const token = localStorage.getItem("auth_token");
     const storedUser = localStorage.getItem("utilisateur");
 
@@ -19,6 +24,8 @@ export function AuthProvider({ children }) {
       return;
     }
 
+=======
+>>>>>>> origin/main
     api
       .get("/moi")
       .then(({ data }) => {
@@ -26,10 +33,15 @@ export function AuthProvider({ children }) {
         setUtilisateur(data);
         localStorage.setItem("utilisateur", JSON.stringify(data));
       })
+<<<<<<< HEAD
       .catch((err) => {
         // Ne déconnecte QUE si le serveur répond explicitement 401 Non autorisé
         if (!annule && err?.response?.status === 401) {
           localStorage.removeItem("auth_token");
+=======
+      .catch(() => {
+        if (!annule) {
+>>>>>>> origin/main
           localStorage.removeItem("utilisateur");
           setUtilisateur(null);
         }
@@ -43,14 +55,20 @@ export function AuthProvider({ children }) {
     setChargement(true);
     setErreur(null);
     try {
+<<<<<<< HEAD
       const { data } = await api.post("/login", { email, password, matricule });
       if (data.token) {
         localStorage.setItem("auth_token", data.token);
       }
+=======
+      await initialiserCsrf();
+      const { data } = await api.post("/login", { email, password, matricule });
+>>>>>>> origin/main
       localStorage.setItem("utilisateur", JSON.stringify(data.utilisateur));
       setUtilisateur(data.utilisateur);
       return data.utilisateur;
     } catch (err) {
+<<<<<<< HEAD
       const apiErrors = err.response?.data?.errors;
       const apiMessage = err.response?.data?.message;
       const networkErreur = !err.response
@@ -99,6 +117,11 @@ export function AuthProvider({ children }) {
         "Une erreur est survenue lors de l'inscription.";
 
       setErreur(message);
+=======
+      setErreur(
+        err.response?.data?.message || "Identifiants incorrects."
+      );
+>>>>>>> origin/main
       throw err;
     } finally {
       setChargement(false);
@@ -120,12 +143,16 @@ export function AuthProvider({ children }) {
     try {
       await api.post("/logout");
     } finally {
+<<<<<<< HEAD
       localStorage.removeItem("auth_token");
+=======
+>>>>>>> origin/main
       localStorage.removeItem("utilisateur");
       setUtilisateur(null);
     }
   }
 
+<<<<<<< HEAD
   return (
     <authContext.Provider
       value={{
@@ -139,6 +166,15 @@ export function AuthProvider({ children }) {
         setErreur,
       }}
     >
+=======
+  const value = useMemo(
+    () => ({ utilisateur, login, logout, actualiserUtilisateur, chargement, erreur }),
+    [utilisateur, chargement, erreur]
+  );
+
+  return (
+    <authContext.Provider value={value}>
+>>>>>>> origin/main
       {children}
     </authContext.Provider>
   );

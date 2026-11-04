@@ -20,8 +20,13 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+<<<<<<< HEAD
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:30,1')->name('login');
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:30,1');
+=======
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:3,1');
+>>>>>>> origin/main
 
 // Public : nécessaire pour peupler le menu déroulant du formulaire d'inscription
 Route::get('/services', [ServiceController::class, 'index']);
@@ -111,6 +116,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // --- Import des dossiers de suivi (Excel/CSV hebdomadaire) ---
         Route::post('/suivi/import', [SuiviDossierController::class, 'import']);
+<<<<<<< HEAD
+=======
+        Route::get('/suivi/modele', [SuiviDossierController::class, 'telechargerModele']);
+        Route::post('/suivi', [SuiviDossierController::class, 'store']);
+        Route::delete('/suivi/{id}', [SuiviDossierController::class, 'destroy']);
+        Route::delete('/suivi', [SuiviDossierController::class, 'destroyAll']);
+>>>>>>> origin/main
 
         // --- Gestion des informations (liste des agents) ---
         Route::post('/informations', [InformationController::class, 'store']);
