@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateAgentIaRequest;
 use App\Models\AgentIa;
-use Illuminate\Http\Request;
 
 class AgentIaController extends Controller
 {
@@ -14,16 +14,11 @@ class AgentIaController extends Controller
     }
 
     // PATCH /api/admin/agents/{id}
-    public function update(Request $request, $id)
+    public function update(UpdateAgentIaRequest $request, $id)
     {
         $agent = AgentIa::findOrFail($id);
 
-        $data = $request->validate([
-            'nom_agent'   => 'sometimes|string|max:100',
-            'description' => 'sometimes|string',
-        ]);
-
-        $agent->update($data);
+        $agent->update($request->validated());
 
         return response()->json($agent);
     }

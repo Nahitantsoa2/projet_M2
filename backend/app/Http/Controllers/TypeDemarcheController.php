@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTypeDemarcheRequest;
 use App\Models\TypeDemarche;
-use Illuminate\Http\Request;
 
 class TypeDemarcheController extends Controller
 {
@@ -14,14 +14,8 @@ class TypeDemarcheController extends Controller
     }
 
     // POST /api/admin/types-demarche — réservé à l'administrateur
-    public function store(Request $request)
+    public function store(StoreTypeDemarcheRequest $request)
     {
-        $data = $request->validate([
-            'libelle'     => 'required|string|max:150',
-            'description' => 'nullable|string',
-            'id_service'  => 'required|exists:service,id_service',
-        ]);
-
-        return response()->json(TypeDemarche::create($data), 201);
+        return response()->json(TypeDemarche::create($request->validated()), 201);
     }
 }

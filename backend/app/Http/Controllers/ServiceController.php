@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreServiceRequest;
+use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
-use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
@@ -30,12 +31,9 @@ class ServiceController extends Controller
     }
 
     // POST /api/admin/services — réservé à l'administrateur
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
-        $data = $request->validate([
-            'nom_service' => 'required|string|max:150|unique:service,nom_service',
-            'description' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         $service = Service::create($data);
 
@@ -43,14 +41,11 @@ class ServiceController extends Controller
     }
 
     // PUT/PATCH /api/admin/services/{id} — réservé à l'administrateur
-    public function update(Request $request, $id)
+    public function update(UpdateServiceRequest $request, $id)
     {
         $service = Service::findOrFail($id);
 
-        $data = $request->validate([
-            'nom_service' => 'sometimes|string|max:150|unique:service,nom_service,' . $id . ',id_service',
-            'description' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         $service->update($data);
 

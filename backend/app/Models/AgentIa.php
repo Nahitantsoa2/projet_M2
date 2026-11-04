@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class AgentIa extends Model
 {
     protected $table = 'agent_ia';
+
     protected $primaryKey = 'id_agent';
+
     public $timestamps = false;
 
     protected $fillable = [

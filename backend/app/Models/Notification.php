@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     protected $table = 'notification';
+
     protected $primaryKey = 'id_notification';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -18,7 +20,7 @@ class Notification extends Model
 
     protected $casts = [
         'date_envoi' => 'datetime',
-        'lu'         => 'boolean',
+        'lu' => 'boolean',
     ];
 
     public function utilisateur()
