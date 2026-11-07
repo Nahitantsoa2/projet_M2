@@ -9,11 +9,7 @@ services:
       - '8000:8000'
     environment:
       - DB_CONNECTION=pgsql
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=demarches_admin
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=5421
+      - DATABASE_URL=postgresql://postgres:5421@db:5432/demarches_admin
     volumes:
       - ./backend:/var/www
     depends_on:

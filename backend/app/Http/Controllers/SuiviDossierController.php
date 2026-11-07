@@ -7,10 +7,7 @@ use App\Models\SuiviDossier;
 use App\Services\RejetDossierNotifier;
 use App\Services\SuiviImportService;
 use Illuminate\Http\Request;
-<<<<<<< HEAD
-=======
 use Symfony\Component\HttpFoundation\StreamedResponse;
->>>>>>> origin/main
 
 class SuiviDossierController extends Controller
 {
@@ -23,12 +20,6 @@ class SuiviDossierController extends Controller
             $query->where('im', $request->input('im'));
         }
 
-<<<<<<< HEAD
-        return response()->json($query->orderBy('id')->get());
-    }
-
-    // POST /api/admin/suivi/import — import d'un fichier Excel/CSV (une ligne par dossier)
-=======
         return response()->json($query->orderByDesc('id')->get());
     }
 
@@ -99,7 +90,6 @@ class SuiviDossierController extends Controller
     }
 
     // POST /api/admin/suivi/import — import d'un fichier Excel/CSV
->>>>>>> origin/main
     public function import(
         ImportSuiviRequest $request,
         SuiviImportService $service,
@@ -117,11 +107,7 @@ class SuiviDossierController extends Controller
         $i = $resultat['ignores'];
         $v = $resultat['invalides'];
 
-<<<<<<< HEAD
-        // Prévenir les fonctionnaires concernés par un dossier rejeté.
-=======
         // Prévenir les fonctionnaires concernés par un dossier rejeté si applicable.
->>>>>>> origin/main
         $notifies = $notifier->notifier($resultat['nouveaux']);
 
         return response()->json([

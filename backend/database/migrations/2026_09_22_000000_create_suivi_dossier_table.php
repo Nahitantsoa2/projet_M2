@@ -8,15 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('suivi_dossier', function (Blueprint $table) {
+        if (!Schema::hasTable('suivi_dossier')) {
+            Schema::create('suivi_dossier', function (Blueprint $table) {
             $table->id();
-<<<<<<< HEAD
-=======
             $table->string('localite')->nullable();
             $table->string('chap')->nullable();
-            $table->string('im')->nullable();
             $table->string('cmv')->nullable();
->>>>>>> origin/main
             $table->string('date_reception')->nullable();
             $table->string('ref_be')->nullable();
             $table->string('ref_dossier')->nullable();
@@ -44,6 +41,7 @@ return new class extends Migration
             $table->string('empreinte', 40)->unique();
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

@@ -7,9 +7,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class SuiviImportService
 {
-<<<<<<< HEAD
-    public const COLONNES = [
-=======
     public const COLONNES_CIBLES = [
         'localite',
         'chap',
@@ -18,7 +15,6 @@ class SuiviImportService
     ];
 
     public const COLONNES_LEGACY = [
->>>>>>> origin/main
         'date_reception',
         'ref_be',
         'ref_dossier',
@@ -47,12 +43,8 @@ class SuiviImportService
 
     /**
      * Importe un fichier Excel/CSV/TSV dans la table suivi_dossier.
-<<<<<<< HEAD
-     * Ajoute uniquement les lignes nouvelles (jamais de doublon).
-=======
      * Prend en charge les champs : Localiter / Localité, chap, im, cmv.
      * Ajoute uniquement les lignes nouvelles (sans doublons).
->>>>>>> origin/main
      *
      * @return array{ajoutes:int, ignores:int, invalides:int, total:int, nouveaux:array<int, SuiviDossier>}
      */
@@ -65,8 +57,6 @@ class SuiviImportService
         $feuille = $classeur->getActiveSheet();
         $lignes = $feuille->toArray(null, true, true, true);
 
-<<<<<<< HEAD
-=======
         if (empty($lignes)) {
             return [
                 'ajoutes' => 0,
@@ -77,45 +67,10 @@ class SuiviImportService
             ];
         }
 
->>>>>>> origin/main
         $ajoutes = 0;
         $ignores = 0;
         $invalides = 0;
         $nouveaux = [];
-<<<<<<< HEAD
-        $premiere = true;
-
-        foreach ($lignes as $key => $ligne) {
-            if ($premiere) {
-                $premiere = false;
-
-                continue;
-            }
-
-            $valeurs = [];
-            foreach (array_keys(self::COLONNES) as $i) {
-                $col = chr(65 + $i);
-                $valeurs[] = $this->formaterCellule($ligne[$col] ?? null);
-            }
-
-            if (empty(implode('', $valeurs))) {
-                continue;
-            }
-
-            $donnees = array_combine(self::COLONNES, $valeurs);
-
-            if (! isset($donnees['im']) || trim($donnees['im']) === '') {
-                $invalides++;
-
-                continue;
-            }
-
-            $donnees['empreinte'] = SuiviDossier::empreinte($valeurs);
-
-            if (SuiviDossier::where('empreinte', $donnees['empreinte'])->exists()) {
-                $ignores++;
-
-=======
 
         // 1. Détection de la structure des colonnes via la première ligne d'en-tête
         $premiereLigneIndex = array_key_first($lignes);
@@ -166,7 +121,6 @@ class SuiviImportService
 
             if (SuiviDossier::where('empreinte', $donnees['empreinte'])->exists()) {
                 $ignores++;
->>>>>>> origin/main
                 continue;
             }
 
@@ -183,8 +137,6 @@ class SuiviImportService
         ];
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Détecte intelligemment les colonnes d'après les en-têtes ou par position par défaut.
      */
@@ -252,7 +204,6 @@ class SuiviImportService
         ];
     }
 
->>>>>>> origin/main
     private function formaterCellule(mixed $valeur): string
     {
         if ($valeur === null) {

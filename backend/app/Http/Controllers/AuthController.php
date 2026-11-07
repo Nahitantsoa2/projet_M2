@@ -47,24 +47,17 @@ class AuthController extends Controller
         $request->session()->regenerate();
         Auth::guard('web')->login($utilisateur);
 
-<<<<<<< HEAD
         $token = $utilisateur->createToken('auth_token')->plainTextToken;
-=======
-        $this->notifierRejets($utilisateur);
->>>>>>> origin/main
 
         $this->notifierRejets($utilisateur);
 
         return response()->json([
             'utilisateur' => $utilisateur->load('service'),
-<<<<<<< HEAD
             'token' => $token,
-=======
->>>>>>> origin/main
         ], 201);
     }
 
-    // POST /api/login — authentification par session (cookie httpOnly)
+    // POST /api/login — authentification par session et token Sanctum
     public function login(LoginRequest $request)
     {
         if (! Auth::guard('web')->attempt($request->only('email', 'password'))) {
@@ -98,33 +91,25 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-<<<<<<< HEAD
         $token = $utilisateur->createToken('auth_token')->plainTextToken;
 
-=======
->>>>>>> origin/main
         // Notifie automatiquement le fonctionnaire de ses éventuels dossiers
         // rejetés (in-app + email), même importés après la création du compte.
         $this->notifierRejets($utilisateur);
 
         return response()->json([
             'utilisateur' => $utilisateur->load('service'),
-<<<<<<< HEAD
             'token' => $token,
-=======
->>>>>>> origin/main
         ]);
     }
 
     // POST /api/logout
     public function logout(Request $request)
     {
-<<<<<<< HEAD
         if ($request->user()) {
             $request->user()->currentAccessToken()?->delete();
         }
-=======
->>>>>>> origin/main
+
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

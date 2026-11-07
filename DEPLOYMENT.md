@@ -30,12 +30,7 @@ Ity rafitra ity dia ahitana:
 
 ### A. Base de données PostgreSQL (amin'ny Neon.tech na Supabase na Render)
 1. Mamorona tetikasa vaovao ao amin'ny [Neon.tech](https://neon.tech) na [Render](https://render.com).
-2. Raiso ny rohy fifandraisana (Connection String / Internal Database URL) na ny:
-   * `DB_HOST`
-   * `DB_PORT` (5432)
-   * `DB_DATABASE`
-   * `DB_USERNAME`
-   * `DB_PASSWORD`
+2. Raiso ny rohy fifandraisana (Connection String / Internal Database URL) ary ampiasao ao amin'ny `DATABASE_URL` (oh: `postgresql://user:pass@host:5432/dbname`).
 
 ### B. Backend Laravel (amin'ny Render.com na Railway.app)
 1. Mamorona **Web Service** vaovao ao amin'ny Render mampifandray amin'ny repository Backend.
@@ -55,11 +50,7 @@ Ity rafitra ity dia ahitana:
    * `APP_KEY` *(Raiso ilay ao amin'ny .env eo an-toerana na ampiasao ny `php artisan key:generate --show`)*
    * `APP_URL=https://votre-backend.onrender.com`
    * `DB_CONNECTION=pgsql`
-   * `DB_HOST=...`
-   * `DB_PORT=5432`
-   * `DB_DATABASE=...`
-   * `DB_USERNAME=...`
-   * `DB_PASSWORD=...`
+   * `DATABASE_URL=postgresql://user:pass@host:5432/dbname`
    * `FRONTEND_URL=https://votre-frontend.vercel.app`
    * `CORS_ALLOWED_ORIGINS=https://votre-frontend.vercel.app`
    * `SANCTUM_STATEFUL_DOMAINS=votre-frontend.vercel.app`

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useEffect, useState } from 'react';
-=======
 import { useEffect, useState, useMemo, useCallback } from 'react';
->>>>>>> origin/main
 import { themeContext } from './ThemeContext';
 
 export const ThemeProvider = ({ children }) => {
@@ -22,14 +18,6 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isDarkMode]);
 
-<<<<<<< HEAD
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  return (
-    <themeContext.Provider value={{ isDarkMode, toggleTheme }}>
-=======
   const toggleTheme = useCallback(() => {
     setIsDarkMode((prev) => !prev);
   }, []);
@@ -38,7 +26,6 @@ export const ThemeProvider = ({ children }) => {
 
   return (
     <themeContext.Provider value={value}>
->>>>>>> origin/main
       {children}
     </themeContext.Provider>
   );

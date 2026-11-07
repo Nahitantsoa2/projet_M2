@@ -39,11 +39,7 @@ export default function Register() {
   const [erreur, setErreur] = useState(null);
   const [envoi, setEnvoi] = useState(false);
   const navigate = useNavigate();
-<<<<<<< HEAD
   const { register } = useAuth();
-=======
-  const { actualiserUtilisateur } = useAuth();
->>>>>>> origin/main
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -69,14 +65,7 @@ export default function Register() {
 
     setEnvoi(true);
     try {
-<<<<<<< HEAD
       await register(form);
-=======
-      await initialiserCsrf();
-      await api.post("/register", form);
-      await actualiserUtilisateur();
-
->>>>>>> origin/main
       navigate("/fonctionnaire", { replace: true });
     } catch (err) {
       const messages = err?.response?.data?.errors;

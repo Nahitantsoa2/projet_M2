@@ -9,13 +9,9 @@ class SuiviDossier extends Model
     protected $table = 'suivi_dossier';
 
     protected $fillable = [
-<<<<<<< HEAD
-=======
         'localite',
         'chap',
-        'im',
         'cmv',
->>>>>>> origin/main
         'date_reception',
         'ref_be',
         'ref_dossier',
